@@ -1,0 +1,50 @@
+type Ticket {
+    ticketNumber: String!,
+    passengerName: String,
+    fareConditions: String,
+    flightNo: String,
+    amount: Float,
+    flightId: Long,
+    departureAirport: String,
+    departureAirportName: String,
+    departureCity: String,
+    status : String,
+    aircraftCode : String
+}
+
+type TicketResult {
+    totalElements : Long,
+    totalPages : Int,
+    result : [Ticket]
+}
+
+type TicketResultGrouping {
+    groupBy : String,
+    result : [TicketGroupItem]
+}
+
+type TicketGroupItem {
+    name : String,
+    count : Long
+}
+
+input PageRequest {
+    pageNumber : Int,
+    pageSize : Int,
+    sortColumns : [String],
+    filters : [Filter]
+}
+
+input Filter {
+    column : String,
+    filtervalue : String,
+    operation : String
+}
+
+type Query {
+    ticket(ticketNumber: String):Ticket
+    tickets(request: PageRequest):TicketResult
+    ticketGrouping(groupBy: String, request: PageRequest) : TicketResultGrouping
+}
+
+
