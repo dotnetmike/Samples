@@ -1,0 +1,42 @@
+Sample database taken from: https://wiki.postgresql.org/wiki/Sample_Databases
+
+Airlines Demo Database - Airlines Demo Database provides database schema with several tables and meaningful content, which can be used for learning SQL and writing applications
+
+1. Go to: https://postgrespro.com/education/demodb
+2. Select demo-big-en.zip (232 MB) — flight data for one year (DB size is about 2.5 GB).
+3. Install in your local postgres database instance.
+
+Create a simple view to work on using the script below:
+-- bookings.tickets_v source
+
+CREATE OR REPLACE VIEW bookings.tickets_v
+AS SELECT t2.ticket_no,
+    t2.passenger_name,
+    tf.fare_conditions,
+    tf.amount,
+    f.flight_id,
+    f.flight_no,
+    f.scheduled_departure,
+    timezone(dep.timezone, f.scheduled_departure) AS scheduled_departure_local,
+    f.scheduled_arrival,
+    timezone(arr.timezone, f.scheduled_arrival) AS scheduled_arrival_local,
+    f.scheduled_arrival - f.scheduled_departure AS scheduled_duration,
+    f.departure_airport,
+    dep.airport_name AS departure_airport_name,
+    dep.city AS departure_city,
+    f.arrival_airport,
+    arr.airport_name AS arrival_airport_name,
+    arr.city AS arrival_city,
+    f.status,
+    f.aircraft_code,
+    f.actual_departure,
+    timezone(dep.timezone, f.actual_departure) AS actual_departure_local,
+    f.actual_arrival,
+    timezone(arr.timezone, f.actual_arrival) AS actual_arrival_local,
+    f.actual_arrival - f.actual_departure AS actual_duration
+   FROM ticket_flights tf,
+    tickets t2,
+    flights f,
+    airports dep,
+    airports arr
+  WHERE f.departure_airport = dep.airport_code AND f.arrival_airport = arr.airport_code AND tf.flight_id = f.flight_id AND tf.ticket_no = t2.ticket_no;
