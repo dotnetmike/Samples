@@ -10,7 +10,7 @@ Create a simple view to work on using the script below:
 -- bookings.tickets_v source
 
 CREATE OR REPLACE VIEW bookings.tickets_v
-AS SELECT t2.ticket_no,
+AS SELECT concat(t2.ticket_no , flight_no) as ticket_no,
     t2.passenger_name,
     tf.fare_conditions,
     tf.amount,
@@ -40,3 +40,54 @@ AS SELECT t2.ticket_no,
     airports dep,
     airports arr
   WHERE f.departure_airport = dep.airport_code AND f.arrival_airport = arr.airport_code AND tf.flight_id = f.flight_id AND tf.ticket_no = t2.ticket_no;
+
+Sample GraphQL:
+query {
+  ticket(ticketNumber:"0005432000285")
+  {
+    ticketNumber,
+    passengerName,
+    status,
+    aircraftCode
+  },
+  tickets( request: {
+      filters: [
+        {
+          column: "aircraftCode",
+          filtervalue: "SU9",
+          operation: "and"
+        }
+      ],
+      pageNumber: 0,
+      pageSize: 10,
+      sortColumns: [
+        "ticketNumber",
+        "flightNo",
+        "aircraftCode"
+      ]
+    }) 
+  {
+   	totalElements,
+    totalPages,
+    result {
+      ticketNumber,
+      passengerName,
+      flightNo,
+      amount
+    }
+  },
+  ticketGrouping(groupBy: "flightNo", 
+    request: {
+      filters: [
+        {
+          column: "aircraftCode",
+          filtervalue: "SU9",
+          operation: "and"
+        }
+      ]
+    }) 
+  {
+    groupBy,
+    result { name, count}
+  }
+}
